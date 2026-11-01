@@ -6,49 +6,23 @@
 import React, { useEffect, useState } from 'react';
 import AboutModal from './components/AboutModal';
 import MapComponent from './components/MapComponent';
-import { Loader2, Info } from 'lucide-react';
+import { Loader2, Compass } from 'lucide-react';
 
 export default function App() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [themeOverridden, setThemeOverridden] = useState(false);
-  const [showAboutModal, setShowAboutModal] = useState(true);
+  const [showAboutModal, setShowAboutModal] = useState(false);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
 
   useEffect(() => {
     checkApiKey();
-    
-    // Initialize theme from system preference
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setIsDarkMode(mediaQuery.matches);
-    
-    const handler = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
-    // const handler = (e: MediaQueryListEvent) => {
-    //   // Only follow system if the user hasn't manually toggled the theme
-    //   setThemeOverridden(prev => {
-    //     if (!prev) {
-    //       setIsDarkMode(e.matches);
-    //     }
-    //     return prev;
-    //   });
-    // };
-    
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
+
+    const handleQuotaExceeded = () => {
+      setQuotaExceeded(true);
+    };
+    window.addEventListener('gmp-quota-exceeded', handleQuotaExceeded);
+    return () => window.removeEventListener('gmp-quota-exceeded', handleQuotaExceeded);
   }, []);
-
-  const handleSetDarkMode = (isDark: boolean) => {
-    setIsDarkMode(isDark);
-    setThemeOverridden(true);
-  };
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
 
   const checkApiKey = async () => {
     try {
@@ -66,7 +40,7 @@ export default function App() {
     return false;
   };
 
-  // Polling for API key if not present
+  // Poll for API key if not yet configured in Secrets
   useEffect(() => {
     if (apiKey || checking) return;
 
@@ -75,110 +49,85 @@ export default function App() {
       if (found) {
         clearInterval(interval);
       }
-    }, 3000); // Check every 3 seconds
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [apiKey, checking]);
 
-  const handleApiKeySubmit = async (key: string) => {
-    const res = await fetch('/api/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey: key }),
-    });
-
-    if (res.ok) {
-      setApiKey(key);
-    } else {
-      throw new Error('Failed to save key');
-    }
-  };
-
-  const handleResetKey = async () => {
-    await fetch('/api/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey: '' }),
-    });
-    setApiKey(null);
-  };
-
-  useEffect(() => {
-    if (!apiKey) return;
-    
-    // Places UI Kit components often look for a script tag with a key to initialize.
-    // When using dynamic loaders, we can help them by ensuring a script tag exists or 
-    // by setting the key in a way they can find.
-    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
-    if (existingScript && !existingScript.hasAttribute('key')) {
-      existingScript.setAttribute('key', apiKey);
-    }
-  }, [apiKey]);
-
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 transition-colors duration-500">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600 dark:text-indigo-400" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F6F1E7] text-[#5A1A24] gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-[#5A1A24]" />
+        <p className="font-serif italic text-lg">Unfurling the Grand Tour Atlas…</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-slate-950 transition-colors duration-500">
-      <AboutModal 
-        isOpen={showAboutModal} 
-        onClose={() => setShowAboutModal(false)} 
-      />
-      
-      <div className="bg-linear-to-r from-indigo-600 via-indigo-500 to-indigo-700 dark:from-indigo-950 dark:to-slate-950 text-white px-4 py-2.5 text-sm flex items-center justify-between z-50 shadow-xl border-b border-white/10">
-        <div className="flex-1 text-center text-[11px] sm:text-sm font-bold tracking-wide">
-          <span className="opacity-90">You can power this applet with a <a href="https://developers.google.com/maps/demo-key?utm_source=ai-studio&utm_medium=website&utm_campaign=FY26_Q1_maps-demo-key&utm_content=maps-demo-key_api-key-link" target="_blank" rel="noopener noreferrer" className="underline font-black text-white hover:text-indigo-200 transition-colors">Maps Demo Key</a> with usage and API limits or get a <a href="https://developers.google.com/maps/get-started?utm_source=ai-studio&utm_medium=website&utm_campaign=FY26_Q1_maps-demo-key&utm_content=maps-standard-key_api-key-link" target="_blank" rel="noopener noreferrer" className="underline font-black text-white hover:text-indigo-200 transition-colors">standard API Key</a> for all GMP APIs.
+    <div className="flex flex-col h-screen bg-[#F6F1E7] text-[#2C1E18]">
+      {quotaExceeded && (
+        <div className="bg-amber-50 border-b border-amber-200 text-amber-900 px-4 py-2.5 text-xs md:text-sm text-center sticky top-0 z-50 shadow-sm">
+          <span>
+            Google Maps Platform quota reached. If you are the app owner, visit{' '}
+            <a
+              href="https://developers.google.com/maps/ai/ai-studio?utm_campaign=gmp_mcp_codeassist_v1_aistudio#quota_exceeded_errors"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-semibold text-amber-950 hover:text-amber-800"
+            >
+              maps developer site
+            </a>{' '}
+            for instructions to update your account.
           </span>
         </div>
-        <button 
-          onClick={() => setShowAboutModal(true)}
-          className="text-[10px] uppercase tracking-widest font-black bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all active:scale-95 ml-4 whitespace-nowrap border border-white/10 flex items-center gap-2"
-        >
-          <Info className="w-3.5 h-3.5" />
-          About this applet
-        </button>
-      </div>
-      <div className="flex-1 relative">
+      )}
+
+      <AboutModal isOpen={showAboutModal} onClose={() => setShowAboutModal(false)} />
+
+      <div className="flex-1 relative overflow-hidden">
         {apiKey ? (
-          <MapComponent 
-            apiKey={apiKey} 
-            isDarkMode={isDarkMode} 
-            setIsDarkMode={handleSetDarkMode} 
-          />
-        ) : !showAboutModal ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-slate-950">
-            <div className="max-w-md space-y-6">
-              <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center mx-auto">
-                <Info className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+          <MapComponent apiKey={apiKey} onOpenAbout={() => setShowAboutModal(true)} />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#F6F1E7] parchment-surface">
+            <div className="max-w-md w-full bg-[#FBF8F3] border-2 border-[#5A1A24] rounded-2xl p-8 shadow-xl space-y-5">
+              <div className="w-14 h-14 bg-[#5A1A24] border-2 border-[#C89D54] rounded-2xl flex items-center justify-center mx-auto">
+                <Compass className="w-7 h-7 text-[#EBD197]" />
               </div>
-              <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">API Key Required</h2>
-              <p className="text-slate-600 dark:text-slate-400">
-                To use the map, please provide a Google Maps API Key in the <span className="font-bold text-indigo-600 dark:text-indigo-400">Secrets</span> panel of AI Studio.
+              <div className="space-y-1">
+                <div className="text-xs font-mono uppercase tracking-widest text-[#846024]">
+                  Il Grand Tour di Ana
+                </div>
+                <h1 className="text-3xl font-serif font-bold text-[#5A1A24]">
+                  Google Maps Key Required
+                </h1>
+              </div>
+              <p className="text-sm text-[#4A372F] leading-relaxed">
+                To illuminate the 39 quest markers across Firenze and Roma, add your{' '}
+                <code className="bg-[#EFE7D6] px-1.5 py-0.5 rounded font-mono text-xs text-[#5A1A24]">
+                  GOOGLE_MAPS_API_KEY
+                </code>{' '}
+                in the AI Studio <strong>Secrets</strong> panel.
               </p>
-              <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-sm text-left space-y-2">
-                <p className="font-bold text-slate-800 dark:text-slate-200">How to set it up:</p>
-                <ol className="list-decimal list-inside space-y-1 text-slate-500 dark:text-slate-400">
-                  <li><span className="font-semibold">Remix</span> this app</li>
-                  <li>Open the <span className="font-semibold">Settings menu</span> and select the <span className="font-semibold">Secrets</span> tab</li>
-                  <li>Add a new secret named <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">GOOGLE_MAPS_API_KEY</code></li>
-                  <li>Paste your Google Maps API Key as the value</li>
+              <div className="p-4 bg-[#EFE7D6] rounded-xl border border-[#D5C7AD] text-xs text-left space-y-1.5 text-[#2C1E18]">
+                <p className="font-bold text-[#5A1A24]">Quick Setup:</p>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>Open <strong>Settings → Secrets</strong> in AI Studio</li>
+                  <li>
+                    Add <code className="font-mono font-semibold">GOOGLE_MAPS_API_KEY</code>
+                  </li>
+                  <li>Paste a Maps Demo Key or your standard Google Maps API Key</li>
                 </ol>
-                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium mt-2 italic">
-                  The app will automatically detect the key and refresh once added.
-                </p>
               </div>
+              <button
+                onClick={() => setShowAboutModal(true)}
+                className="w-full py-2.5 px-4 rounded-xl bg-[#5A1A24] text-[#F6F1E7] text-xs font-semibold hover:bg-[#46131B] transition-colors cursor-pointer"
+              >
+                How to Get a Demo or Standard Key
+              </button>
             </div>
           </div>
-        ) : (
-          <div className="absolute inset-0 bg-slate-50 dark:bg-slate-950" />
         )}
       </div>
     </div>
   );
 }
-

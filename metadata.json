@@ -1,6 +1,8 @@
 {
   "name": "ITALIA",
-  "description": "Explore top global cities and save destinations using this Google Maps Platform travel planner",
+  "description": "Il Grand Tour di Ana — An illuminated quest map of Florence and Rome with animated trails, custom monument crests, and Passaporto stamps.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

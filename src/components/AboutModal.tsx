@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ExternalLink, MapPin, X } from 'lucide-react';
+import { ExternalLink, Compass, X } from 'lucide-react';
 
 interface AboutModalProps {
   isOpen: boolean;
@@ -17,85 +17,89 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-[#2C1E18]/70 backdrop-blur-sm"
           />
-          
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-800 relative z-10 custom-scrollbar"
+            exit={{ opacity: 0, scale: 0.95, y: 12 }}
+            className="bg-[#F6F1E7] parchment-surface rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border-2 border-[#5A1A24] relative z-10 custom-scrollbar text-[#2C1E18]"
           >
-            <button 
+            <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-[#5A1A24]/10 text-[#5A1A24] transition-colors cursor-pointer"
+              aria-label="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="p-8 sm:p-10">
-              <div className="flex flex-col items-center text-center mb-10">
-                <div className="w-16 h-16 bg-linear-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-indigo-500/20">
-                  <MapPin className="w-8 h-8 text-white" />
+            <div className="p-7 sm:p-9">
+              <div className="flex flex-col items-center text-center mb-7">
+                <div className="w-14 h-14 bg-[#5A1A24] border-2 border-[#C89D54] rounded-2xl flex items-center justify-center mb-4 shadow-md">
+                  <Compass className="w-7 h-7 text-[#EBD197]" />
                 </div>
-                <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-3">Maps Travel Planner</h1>
-                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-xs mx-auto">
-                  Explore top global cities and save destinations using this Google Maps Platform travel planner.
+                <h2 className="text-3xl font-serif font-bold text-[#5A1A24] tracking-tight mb-2">
+                  Il Grand Tour di Ana · API Guide
+                </h2>
+                <p className="text-[#6E5A4F] text-sm leading-relaxed max-w-sm mx-auto">
+                  Explore Ana’s 39 curated locations across Florence and Rome using Google Maps Platform and Gemini Grounding.
                 </p>
               </div>
 
-              <div className="space-y-6">
-                {/* APIs Section */}
-                <div className="space-y-2">
-                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">This applet uses the following APIs:</p>
-                  <ul className="list-disc list-inside space-y-1 ml-1">
-                    <li className="text-xs font-bold text-slate-600 dark:text-slate-400">Maps Javascript API</li>
-                    <li className="text-xs font-bold text-slate-600 dark:text-slate-400">Places UI Kit</li>
+              <div className="space-y-5">
+                <div className="space-y-1.5 bg-[#FBF8F3] p-4 rounded-xl border border-[#D5C7AD]">
+                  <p className="text-[11px] font-mono font-bold text-[#846024] uppercase tracking-wider">
+                    Google Maps Platform &amp; AI Services Used:
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-xs text-[#2C1E18]">
+                    <li>Maps JavaScript API (Advanced Markers, Vector Map &amp; Polylines)</li>
+                    <li>Weather API (Live Florence &amp; Rome Current Conditions &amp; 3-Day Forecast)</li>
+                    <li>Routes API (Optional automatic walking trail upgrade with standard key)</li>
+                    <li>Gemini 3.8 Flash with Google Maps Grounding &amp; Google Search Grounding</li>
                   </ul>
                 </div>
 
-                {/* Primary Action Card: Maps Demo Key */}
-                <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-linear-to-r from-indigo-500 to-indigo-400 rounded-2xl blur-sm opacity-20 group-hover:opacity-30 transition duration-500"></div>
-                  <div className="relative bg-white dark:bg-slate-800 rounded-2xl p-6 border border-indigo-100 dark:border-indigo-900/30 shadow-sm">
-                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                      To power this applet, you can use a credit-card free <a href="https://developers.google.com/maps/demo-key?utm_source=ai-studio&utm_medium=website&utm_campaign=FY26_Q1_maps-demo-key&utm_content=maps-demo-key_api-key-link" target="_blank" rel="noopener noreferrer" className="font-black text-indigo-600 dark:text-indigo-400 hover:underline">Maps Demo Key</a>.
-                    </p>
-
+                <div className="bg-[#EFE7D6] rounded-xl p-5 border border-[#C89D54]">
+                  <p className="text-xs text-[#2C1E18] leading-relaxed mb-4">
+                    You can power this applet with a credit-card-free{' '}
                     <a
-                      href="https://developers.google.com/maps/demo-key?utm_source=ai-studio&utm_medium=website&utm_campaign=FY26_Q1_maps-demo-key&utm_content=maps-demo-key_api-key-link" 
+                      href="https://developers.google.com/maps/demo-key?utm_source=ai-studio&utm_medium=website&utm_campaign=gmp_mcp_codeassist_v1_aistudio&utm_content=maps-demo-key_api-key-link"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98] text-sm"
+                      className="font-bold text-[#5A1A24] underline"
                     >
-                      Get a demo key
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
+                      Maps Demo Key
+                    </a>{' '}
+                    or provide a{' '}
+                    <a
+                      href="https://developers.google.com/maps/get-started?utm_source=ai-studio&utm_medium=website&utm_campaign=gmp_mcp_codeassist_v1_aistudio&utm_content=maps-standard-key_api-key-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-[#5A1A24] underline"
+                    >
+                      standard API Key
+                    </a>{' '}
+                    to unlock street-level Routes API paths.
+                  </p>
 
-                {/* Secondary Info: Standard Key */}
-                <div className="text-center pt-2">
-                  <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-wider">If you want to add additional GMP capabilities:</p>
                   <a
-                    href="https://developers.google.com/maps/get-started?utm_source=ai-studio&utm_medium=website&utm_campaign=FY26_Q1_maps-demo-key&utm_content=maps-standard-key_api-key-link"
+                    href="https://developers.google.com/maps/demo-key?utm_source=ai-studio&utm_medium=website&utm_campaign=gmp_mcp_codeassist_v1_aistudio&utm_content=maps-demo-key_api-key-link"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-bold text-xs transition-colors"
+                    className="flex items-center justify-center gap-2 w-full bg-[#5A1A24] hover:bg-[#46131B] text-[#F6F1E7] font-semibold py-3 rounded-xl transition-all text-xs"
                   >
-                    Get a standard key
+                    <span>Get a Maps Demo Key</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
 
-                <div className="pt-2">
-                  <button
-                    onClick={onClose}
-                    className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black py-4 rounded-2xl transition-all hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98] text-lg tracking-tight shadow-xl"
-                  >
-                    Start exploring
-                  </button>
-                </div>
+                <button
+                  onClick={onClose}
+                  className="w-full bg-[#2C1E18] hover:bg-[#46131B] text-[#F6F1E7] font-serif font-bold py-3.5 rounded-xl transition-colors text-lg cursor-pointer"
+                >
+                  Return to Il Grand Tour
+                </button>
               </div>
             </div>
           </motion.div>
